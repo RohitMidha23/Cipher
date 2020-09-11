@@ -15,6 +15,15 @@ public class hill {
     static int casevariable;
     static String line="";
 
+    public static int mod26(int a){ 
+        int result = (a%26);
+        if(result<0){
+            // java % returns negative numbers
+            result += 26;
+        }
+        return result;
+    }
+
     // Display function to print a matrix
     public static void displayMatrix(int A[][],int length) {
         for (int i = 0; i < length; i++) {
@@ -113,7 +122,7 @@ public class hill {
             {
                 rm[i] += keyMatrix[i][j] * lm[j];
             }
-            rm[i] %= 26;
+            rm[i] = mod26(rm[i]);
         }
     }
 
@@ -127,7 +136,7 @@ public class hill {
             {
                 rm[i] += inverseKeyMatrix[i][j] * lm[j];
             }
-            rm[i] %= 26;
+            rm[i] = mod26(rm[i]);
         }
     }
     
@@ -220,8 +229,8 @@ public class hill {
         b = new int[r][r];
         inv = new int[r][r];
         int d = findDeterminant(keyMatrix, r);
-        int mi = mi(d % 26);
-        mi %= 26;
+        int mi = mi(mod26(d));
+        mi = mod26(mi);
         if (mi < 0)
             mi += 26;
         for (i = 0; i < r; i++)
@@ -235,11 +244,11 @@ public class hill {
         {
             for (j = 0; j < r; j++)
             {
-                inv[i][j] = b[i][j] % 26;
+                inv[i][j] = mod26(b[i][j]);
                 if (inv[i][j] < 0)
                     inv[i][j] += 26;
                 inv[i][j] *= mi;
-                inv[i][j] %= 26;
+                inv[i][j] = mod26(inv[i][j]);
             }
         }
         //System.out.println("\nInverse key:");
