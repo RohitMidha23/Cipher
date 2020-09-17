@@ -75,7 +75,7 @@ public class railfence {
                 j--;
             }
         }
-        printMatrix(matrix, row, column);
+        // printMatrix(matrix, row, column);
         int index=0;
         for(int i=0; i<row; i++){
             for(int k=0; k<column; k++){
