@@ -3,14 +3,6 @@ import java.util.Scanner;
 import java.util.Arrays;
 
 public class railfence {
-    public static int mod26(int a){ 
-        int result = (a%26);
-        if(result<0){
-            // java % returns negative numbers
-            result += 26;
-        }
-        return result;
-    }
 
     public static void printMatrix(char[][] matrix, int row, int column){
         char ignore='1';
