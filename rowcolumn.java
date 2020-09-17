@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.HashMap;
 
 public class rowcolumn {
 
@@ -20,6 +21,10 @@ public class rowcolumn {
         int columns = keyLength;
         int rows = (int) (text.length() / columns);
         char[][] matrix = new char[rows][columns];
+        HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+        for(int i=0; i<keyLength; i++){
+            map.put(key[i], i);
+        }
         for(int i=0; i<rows; i++){
             for(int j=0; j<columns; j++){
                matrix[i][j] = '1'; 
@@ -41,10 +46,10 @@ public class rowcolumn {
         System.out.println("ENCRYPTION MATRIX:");
         printMatrix(matrix, rows, columns);
         for(int i=0; i<keyLength; i++){
-            // key[i] is column index
+            // map[i] is column index
             // j is row index
             for(int j=0; j<rows; j++){
-                encrypted += matrix[j][key[i]];
+                encrypted += matrix[j][map.get(i)];
             }
         }
         return encrypted;
@@ -61,14 +66,20 @@ public class rowcolumn {
                matrix[i][j] = '1'; 
             }
         }
+        HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+        for(int i=0; i<keyLength; i++){
+            map.put(key[i], i);
+        }
         int index=0;
         for(int i=0; i<keyLength; i++){
             // key[i] is column index
             // j is row index
             for(int j=0; j<rows; j++){
-                matrix[j][key[i]] = text.charAt(index++);
+                matrix[j][map.get(i)] = text.charAt(index++);
             }
         }
+        System.out.println("DECRYPTION MATRIX:");
+        printMatrix(matrix, rows, columns);
         for(int i=0; i<rows; i++){
             for(int j=0; j<columns; j++){
                decrypted += matrix[i][j];
