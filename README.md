@@ -10,3 +10,4 @@ Implementation of various ciphers in Java.
 4. Vigenere Cipher 
 5. Rail Fence Cipher
 6. Row Column Transposition Cipher
+7. DES
