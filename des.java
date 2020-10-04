@@ -1,5 +1,6 @@
-import java.util.*;
+import java.lang.StringBuffer;
 import java.math.*;
+import java.util.*;
 
 public class des {
     static int[] pc1 = { 57, 49, 41, 33, 25, 17, 9, 1, 58, 50, 42, 34, 26, 18, 10, 2, 59, 51, 43, 35, 27, 19, 11, 3, 60,
@@ -277,9 +278,31 @@ public class des {
         return output;
     }
 
+    public static String stringToHex(String str){
+        StringBuffer sb = new StringBuffer();
+        //Converting string to character array
+        char charArray[] = str.toCharArray();
+        for(int i = 0; i < charArray.length; i++) {
+            String hexString = Integer.toHexString(charArray[i]);
+            sb.append(hexString);
+        }
+        return sb.toString();
+    }
+
+    public static String hexToString(String str){
+        String result = new String();
+        char[] charArray = str.toCharArray();
+        for(int i = 0; i < charArray.length; i=i+2) {
+            String st = ""+charArray[i]+""+charArray[i+1];
+            char ch = (char)Integer.parseInt(st, 16);
+            result = result + ch;
+        }
+        return result;
+    }
+
     public static void main(String[] args) {
         Scanner s = new Scanner(System.in);
-        String text, key;
+        String text, key, strText;
 
         System.out.print("Enter 64 bit key: ");
         key = s.nextLine();
@@ -296,12 +319,14 @@ public class des {
             System.out.print("\nSUB KEY " + String.valueOf(i + 1) + ": " + subkeys[i]);
 
         System.out.print("\n\nEnter text to encrypt: ");
-        text = s.nextLine();
-
+        strText = s.nextLine();
+        text = stringToHex(strText);
         String encrypted = encryptDecrypt(text, false);
+        // System.out.println("\nHEX: " + text);
         System.out.println("ENCRYPTED TEXT: " + encrypted);
 
         String decrypted = encryptDecrypt(encrypted, true);
-        System.out.println("\nDECRYPTED TEXT: " + decrypted);
+        // System.out.println("\nHEX: " + decrypted);
+        System.out.println("\nDECRYPTED TEXT: " + hexToString(decrypted));
     }
 }
