@@ -91,7 +91,7 @@ public class des {
     }
 
     public static void keygen(String key) {
-        String bin = new BigInteger(key, 16).toString(2);
+        String bin = new BigInteger(key, 16).toString(2); // hex to binary 
         String left, right;
         while (bin.length() != 64)
             bin = "0" + bin;
@@ -281,7 +281,7 @@ public class des {
         Scanner s = new Scanner(System.in);
         String text, key;
 
-        System.out.print("\nEnter 64 bit key: ");
+        System.out.print("Enter 64 bit key: ");
         key = s.nextLine();
         while (!key.matches("^[a-f0-9]{16}$")) {
             System.out.print("\nInvalid key, try again: ");
@@ -291,9 +291,9 @@ public class des {
         keygen(key); // GENERATES 16 SUBKEYS
 
         // PRINT SUBKEYS
-        System.out.print("\n-----SUBKEYS-----");
+        System.out.print("\n-----SUB KEYS-----");
         for (int i = 0; i < 16; i++)
-            System.out.print("\nSUBKEY " + String.valueOf(i + 1) + ": " + subkeys[i]);
+            System.out.print("\nSUB KEY " + String.valueOf(i + 1) + ": " + subkeys[i]);
 
         System.out.print("\n\nEnter text to encrypt: ");
         text = s.nextLine();
@@ -302,6 +302,6 @@ public class des {
         System.out.println("ENCRYPTED TEXT: " + encrypted);
 
         String decrypted = encryptDecrypt(encrypted, true);
-        System.out.println("\nDECRYPTED STRING: " + decrypted);
+        System.out.println("\nDECRYPTED TEXT: " + decrypted);
     }
 }
