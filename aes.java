@@ -48,6 +48,7 @@ public class aes {
  
     public static String decrypt(String text, String key) 
     {
+        // text is already base64 encoded
         try
         {
             setKey(key);
