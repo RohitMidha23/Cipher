@@ -14,3 +14,4 @@ Implementation of various ciphers in Java.
 8. RSA
 9. Diffie Hellman Shared Key Generation
 10. AES
+11. SHA-1
