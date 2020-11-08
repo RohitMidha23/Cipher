@@ -18,3 +18,4 @@ Implementation of various ciphers in Java.
 12. Miller Rabin Primality Test
 13. DSS
 14. Extended Euclids Algorithm
+15. Chinese Remainder Theorem
