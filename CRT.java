@@ -29,8 +29,8 @@ public class CRT {
 
     public static void main(String[] args) {
         {
-            Integer num[] = { 3, 5, 7 };
-            Integer rem[] = { 2, 3, 2 };
+            Integer num[] = { 3, 5, 7 }; // all mi's
+            Integer rem[] = { 2, 3, 2 }; // all ai's
             Integer k = num.length;
             System.out.println("x is " + solve(num, rem, k));
         }
