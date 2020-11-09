@@ -2,7 +2,7 @@ import java.lang.StringBuffer;
 import java.math.*;
 import java.util.*;
 
-public class des {
+public class des1 {
     static int[] pc1 = { 57, 49, 41, 33, 25, 17, 9, 1, 58, 50, 42, 34, 26, 18, 10, 2, 59, 51, 43, 35, 27, 19, 11, 3, 60,
             52, 44, 36, 63, 55, 47, 39, 31, 23, 15, 7, 62, 54, 46, 38, 30, 22, 14, 6, 61, 53, 45, 37, 29, 21, 13, 5, 28,
             20, 12, 4 };
@@ -92,7 +92,7 @@ public class des {
     }
 
     public static void keygen(String key) {
-        String bin = new BigInteger(key, 16).toString(2); // hex to binary 
+        String bin = new BigInteger(key, 16).toString(2); // hex to binary
         String left, right;
         while (bin.length() != 64)
             bin = "0" + bin;
@@ -102,11 +102,11 @@ public class des {
 
         // GENERATE 16 SUBKEYS
         for (int i = 1; i < 17; i++) {
-            if (i == 1 || i == 2 || i == 9 || i == 16) { 
+            if (i == 1 || i == 2 || i == 9 || i == 16) {
                 // left shift once
                 left = leftShift(left, 1);
                 right = leftShift(right, 1);
-            } else { 
+            } else {
                 // left shift twice
                 left = leftShift(left, 2);
                 right = leftShift(right, 2);
@@ -278,23 +278,23 @@ public class des {
         return output;
     }
 
-    public static String stringToHex(String str){
+    public static String stringToHex(String str) {
         StringBuffer sb = new StringBuffer();
-        //Converting string to character array
+        // Converting string to character array
         char charArray[] = str.toCharArray();
-        for(int i = 0; i < charArray.length; i++) {
+        for (int i = 0; i < charArray.length; i++) {
             String hexString = Integer.toHexString(charArray[i]);
             sb.append(hexString);
         }
         return sb.toString();
     }
 
-    public static String hexToString(String str){
+    public static String hexToString(String str) {
         String result = new String();
         char[] charArray = str.toCharArray();
-        for(int i = 0; i < charArray.length; i=i+2) {
-            String st = ""+charArray[i]+""+charArray[i+1];
-            char ch = (char)Integer.parseInt(st, 16);
+        for (int i = 0; i < charArray.length; i = i + 2) {
+            String st = "" + charArray[i] + "" + charArray[i + 1];
+            char ch = (char) Integer.parseInt(st, 16);
             result = result + ch;
         }
         return result;
