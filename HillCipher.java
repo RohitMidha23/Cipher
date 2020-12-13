@@ -1,24 +1,25 @@
-import java.math.BigInteger;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Scanner;
 
-public class HillCipher {
-    HashMap<Character, Integer> alphaToInt = new HashMap<Character, Integer>(26);
+class Main {
     HashMap<Integer, Character> intToAlpha = new HashMap<Integer, Character>(26);
+    HashMap<Character, Integer> alphaToInt = new HashMap<Character, Integer>(26);
 
     Integer[][] keyMatrix;
     Integer[][] keyMatrixInverse;
     Double keyMatrixSize;
 
-    public HillCipher() {
+    public Main() {
+        System.out.println("INIT CONSTRUCTOR");
         for (int i = 0; i < 26; i++) {
-            alphaToInt.put((char) (i + 65), i);
             intToAlpha.put(i, (char) (i + 65));
+            alphaToInt.put((char) (i + 65), i);
         }
     }
 
-    public static void printMatrix(Integer[][] matrix, int rows, int columns) {
+    public static void printMatrix(Integer[][] matrix, int rows, int cols) {
         for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
+            for (int j = 0; j < cols; j++) {
                 System.out.print(matrix[i][j] + "\t");
             }
             System.out.println("\n");
@@ -26,66 +27,57 @@ public class HillCipher {
     }
 
     public void initKeyMatrix(String key) {
-        Integer len = key.length();
+        int len = key.length();
         keyMatrixSize = Math.floor(Math.sqrt(len));
 
         keyMatrix = new Integer[keyMatrixSize.intValue()][keyMatrixSize.intValue()];
         keyMatrixInverse = new Integer[keyMatrixSize.intValue()][keyMatrixSize.intValue()];
-
+        int index = 0;
         for (int i = 0; i < keyMatrixSize; i++) {
             for (int j = 0; j < keyMatrixSize; j++) {
-                keyMatrix[i][j] = alphaToInt.get(key.charAt(i));
+                keyMatrix[i][j] = alphaToInt.get(key.charAt(index));
+                index++;
+                // System.out.println(keyMatrix[i][j]);
             }
         }
-        System.out.println("KEY MATRIX");
+        System.out.println("KEY MATRIX:");
         printMatrix(keyMatrix, keyMatrixSize.intValue(), keyMatrixSize.intValue());
     }
 
-    public Integer[][] matrixMultiplication(Integer[][] matrix, Integer[][] vec) {
-        Integer[][] c = new Integer[keyMatrixSize.intValue()][1];
-        for (int i = 0; i < keyMatrixSize; i++) {
-            for (int j = 0; j < 1; j++) {
-                c[i][j] = 0;
-                for (int k = 0; k < keyMatrixSize; k++) {
-                    c[i][j] += matrix[i][k] + vec[k][j];
-                }
-                c[i][j] = Math.floorMod(c[i][j], 26);
-            }
-        }
-        return c;
-    }
-
-    public Integer modInverse(Integer a, Integer n) {
-        BigInteger N = BigInteger.valueOf(n);
-        try {
-            BigInteger mi = BigInteger.valueOf(a).modInverse(N);
-            return mi.intValue();
-        } catch (Exception e) {
+    public int sign(int n) {
+        if (n % 2 == 0) {
+            return 1;
+        } else {
             return -1;
         }
     }
 
-    public Integer[][] getSubMatrix(Integer[][] matrix, Integer excludeRow, Integer excludeCol){
-        Integer[][] subM = new Integer[(matrix.length - 1)][(matrix.length - 1)];
-        int r=-1;
-        for(int i=0; i<matrix.length; i++){
-            if(i==excludeRow.intValue()){
-                continue;
+    public int modInverse(int a, int n) {
+        a = a % n;
+        for (int i = 1; i < n; i++) {
+            if (Math.floorMod(a * i, 26) == 1) {
+                return i;
             }
+        }
+        return -1;
+    }
+
+    public Integer[][] getSubMatrix(Integer[][] matrix, Integer excludingRow, Integer excludingCol) {
+        Integer[][] subM = new Integer[(matrix.length - 1)][(matrix.length - 1)];
+
+        int r = -1;
+        for (int i = 0; i < matrix.length; i++) {
+            if (i == excludingRow)
+                continue;
             r++;
-            int c = -1
-            for(int j=0; j<matrix.length; j++){
-                if(j==excludeCol.intValue()){
+            int c = -1;
+            for (int j = 0; j < matrix.length; j++) {
+                if (j == excludingCol)
                     continue;
-                }
                 subM[r][++c] = matrix[i][j];
             }
         }
         return subM;
-    }
-
-    public Integer signChange(Integer n) {
-        return n % 2 == 0 ? 1 : -1;
     }
 
     public Integer getDeterminant(Integer[][] matrix) {
@@ -94,108 +86,124 @@ public class HillCipher {
         } else if (matrix.length == 2) {
             return Math.floorMod((matrix[0][0] * matrix[1][1]) - (matrix[0][1] * matrix[1][0]), 26);
         } else {
-            Double sum = 0;
+            Integer det = 0;
             for (int i = 0; i < matrix.length; i++) {
-                sum += signChange(i) * matrix[0][i] * getDeterminant(getSubMatrix(matrix, 0, i));
+                det += sign(i) * matrix[0][i] * getDeterminant(getSubMatrix(matrix, 0, i));
             }
-            return Math.floorMod(sum.intValue(), 26);
+            return Math.floorMod(det.intValue(), 26);
         }
     }
 
     public Integer[][] getAdjointMatrix(Integer[][] matrix) {
         Integer[][] adj = new Integer[keyMatrixSize.intValue()][keyMatrixSize.intValue()];
+        Integer[][] adjT = new Integer[keyMatrixSize.intValue()][keyMatrixSize.intValue()];
+
         for (int i = 0; i < keyMatrixSize; i++) {
             for (int j = 0; j < keyMatrixSize; j++) {
-                adj[i][j] = signChange(i) * signChange(j) * getDeterminant(getSubMatrix(matrix, i, j));
+                adj[i][j] = sign(i) * sign(j) * getDeterminant(getSubMatrix(matrix, i, j));
             }
         }
-        Integer[][] transposedAdj = new Integer[keyMatrixSize.intValue()][keyMatrixSize.intValue()];
+
         for (int i = 0; i < keyMatrixSize; i++) {
             for (int j = 0; j < keyMatrixSize; j++) {
-                transposedAdj[i][j] = adj[i][j];
+                adjT[i][j] = adj[j][i];
             }
         }
-        return transposedAdj;
+        return adjT;
     }
 
     public void initKeyMatrixInverse() {
         Integer det = getDeterminant(keyMatrix);
-        Integer inv = modInverse(det, 26);
-        if (det == -1) {
-            System.out.println("[ERR[ MATRIX CANT BE INVERTED...");
+        Integer detInv = modInverse(det, 26);
+        if (detInv == -1) {
+            System.out.println("Determinant: " + det);
+            System.out.println("[ERR] Determinant Modular Inverse can't be calculated...");
             System.exit(-1);
         }
         Integer[][] adjoint = getAdjointMatrix(keyMatrix);
         for (int i = 0; i < keyMatrixSize; i++) {
             for (int j = 0; j < keyMatrixSize; j++) {
-                keyMatrixInverse[i][j] = Math.floorMod(inv * adjoint[i][j], 26);
+                keyMatrixInverse[i][j] = Math.floorMod(detInv * adjoint[i][j], 26);
             }
         }
-        System.out.println("INVERSE KEY MATRIX");
+        System.out.println("KEY MATRIX INVERSE");
         printMatrix(keyMatrixInverse, keyMatrixSize.intValue(), keyMatrixSize.intValue());
+    }
 
+    public Integer[][] matrixMultiplication(Integer[][] matrix, Integer[][] vec) {
+        Integer[][] result = new Integer[keyMatrixSize.intValue()][1];
+        for (int i = 0; i < keyMatrixSize; i++) {
+            for (int j = 0; j < 1; j++) {
+                result[i][j] = 0;
+                for (int k = 0; k < keyMatrixSize; k++) {
+                    result[i][j] += matrix[i][k] * vec[k][j];
+                }
+            }
+        }
+        for (int i = 0; i < keyMatrixSize; i++) {
+            for (int j = 0; j < 1; j++) {
+                int temp = result[i][j];
+                result[i][j] = Math.floorMod(temp, 26);
+            }
+        }
+        return result;
     }
 
     public String encrypt(String text) {
-        String encrypted = ""
+        String encrypted = "";
+        // padding
         if (text.length() % keyMatrixSize.intValue() != 0) {
-            for (int i = 0; text.length() % keyMatrixSize.intValue() == 0; i++) {
-                text += "X";
+            for (int i = 0; i < text.length() % keyMatrixSize.intValue(); i++) {
+                text += "Z";
             }
         }
+        System.out.println("TEXT TO ENCRYPT:" + text);
         for (int i = 0; i < Math.floorDiv(text.length(), keyMatrixSize.intValue())
                 * keyMatrixSize.intValue(); i += keyMatrixSize.intValue()) {
-                    Integer[][] vec = new Integer[keyMatrixSize.intValue()][1];
-                    for(int j=0; j<keyMatrixSize; j++){ 
-                        vec[j][0] = alphaToInt.get(text.charAt(i+j));
-                    }
-                    Integer[][] encryptedVec = matrixMultiplication(keyMatrix, vec);
-                    for(int j=0; j<keyMatrixSize; j++){
-                        encrypted += intToAlpha.get(encryptedVec[j][0]);
-                    }
+            Integer[][] vec = new Integer[keyMatrixSize.intValue()][1];
+            for (int j = 0; j < keyMatrixSize; j++) {
+                vec[j][0] = alphaToInt.get(text.charAt(i + j));
+            }
+            Integer[][] encryptedVec = matrixMultiplication(keyMatrix, vec);
+
+            for (int j = 0; j < keyMatrixSize; j++) {
+                encrypted += intToAlpha.get(encryptedVec[j][0]);
+            }
         }
         return encrypted;
     }
 
     public String decrypt(String text) {
-        String decrypted = ""
+        String decrypted = "";
         for (int i = 0; i < Math.floorDiv(text.length(), keyMatrixSize.intValue())
                 * keyMatrixSize.intValue(); i += keyMatrixSize.intValue()) {
-                    Integer[][] vec = new Integer[keyMatrixSize.intValue()][1];
-                    for(int j=0; j<keyMatrixSize; j++){ 
-                        vec[j][0] = alphaToInt.get(text.charAt(i+j));
-                    }
-                    Integer[][] decryptedVec = matrixMultiplication(keyMatrixInverse, vec);
-                    for(int j=0; j<keyMatrixSize; j++){
-                        decrypted += intToAlpha.get(decryptedVec[j][0]);
-                    }
+            Integer[][] vec = new Integer[keyMatrixSize.intValue()][1];
+            for (int j = 0; j < keyMatrixSize; j++) {
+                vec[j][0] = alphaToInt.get(text.charAt(i + j));
+            }
+            Integer[][] decryptedVec = matrixMultiplication(keyMatrixInverse, vec);
+            for (int j = 0; j < keyMatrixSize; j++) {
+                decrypted += intToAlpha.get(decryptedVec[j][0]);
+            }
         }
         return decrypted;
     }
 
     public static void main(String[] args) {
-        HillCipher hillCipher = new HillCipher();
         Scanner s = new Scanner(System.in);
-        String text = "";
-
-        System.out.println("Enter Plain Text:");
-        text = s.nextLine();
-
-        text = text.replaceAll(" ", "");
-        String keyword = "";
-
-        System.out.println("Enter KeyWord:");
-        keyword = s.nextLine();
-
-        keyword = keyword.replaceAll(" ", "");
-        hillCipher.initKeyMatrix(keyword);
-        String encryptedText = hillCipher.encrypt(text);
-
+        String key, text, encrypted, decrypted;
+        System.out.print("ENTER KEY: ");
+        key = s.next();
+        Main hillCipher = new Main();
+        hillCipher.initKeyMatrix(key);
         hillCipher.initKeyMatrixInverse();
-        System.out.println("Encrypted Text:" + encryptedText);
-        String decryptedText = hillCipher.decrypt(encryptedText);
-        System.out.println("Decrypted Text:" + decryptedText);
-        s.close();
-    }
 
+        System.out.print("ENTER TEXT: ");
+        text = s.next();
+        encrypted = hillCipher.encrypt(text);
+        System.out.println("ENCRYPTED TEXT: " + encrypted);
+
+        decrypted = hillCipher.decrypt(encrypted);
+        System.out.println("DECRYPTED TEXT: " + decrypted);
+    }
 }
